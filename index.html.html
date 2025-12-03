@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            min-height: 100vh;
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .error-message {
+            color: var(--error);
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            background: rgba(239, 68, 68, 0.1);
+            display: none;
+        }
+
+        /* Admin Dashboard */
+        .admin-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--dark);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo h2 {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 2rem 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        .nav-links i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            margin: 2rem;
+            width: calc(100% - 4rem);
+            background: rgba(239, 68, 68, 0.2);
+            color: white;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .header h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h3 {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        /* Edit Sections */
+        .edit-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .edit-section.active {
+            display: block;
+        }
+
+        .edit-section h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray);
+        }
+
+        /* Form Styles */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0da271;
+        }
+
+        /* Skills */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .skill-tag {
+            background: var(--gray);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-tag button {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.8rem;
+        }
+
+        /* Services and Portfolio Items */
+        .items-list {
+            margin: 1rem 0;
+        }
+
+        .item-card {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        /* Messages */
+        .messages-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message-card {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .message-email {
+            color: var(--primary);
+        }
+
+        .message-time {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .success-message.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+
+            .nav-links a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 0.5rem 1rem;
+            }
+
+            .nav-links a:hover,
+            .nav-links a.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--primary);
+            }
+
+            .logout-btn {
+                margin: 1rem auto;
+                max-width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 2rem 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <div id="login-error" class="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="#hero" data-section="hero">
+                    <i class="fas fa-home"></i> Hero Section
+                </a></li>
+                <li><a href="#about" data-section="about">
+                    <i class="fas fa-user"></i> About Section
+                </a></li>
+                <li><a href="#services" data-section="services">
+                    <i class="fas fa-cogs"></i> Services
+                </a></li>
+                <li><a href="#portfolio" data-section="portfolio">
+                    <i class="fas fa-briefcase"></i> Portfolio
+                </a></li>
+                <li><a href="#contact" data-section="contact">
+                    <i class="fas fa-envelope"></i> Contact Info
+                </a></li>
+                <li><a href="#messages" data-section="messages">
+                    <i class="fas fa-comments"></i> Messages
+                </a></li>
+            </ul>
+            <button class="btn logout-btn" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">A</div>
+                    <span id="user-email">admin@example.com</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="edit-section active">
+                <h2>Dashboard Overview</h2>
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <h3>Total Services</h3>
+                        <div class="card-value" id="total-services">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Portfolio Projects</h3>
+                        <div class="card-value" id="total-projects">0</div>
+                    </div>
+                    <div class="card">
+                        <h3>Messages</h3>
+                        <div class="card-value" id="total-messages">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Section Editor -->
+            <div id="hero-section" class="edit-section">
+                <h2>Edit Hero Section</h2>
+                <form id="hero-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hero-title">Title</label>
+                            <input type="text" id="hero-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hero-tagline">Tagline</label>
+                            <input type="text" id="hero-tagline" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="hero-description">Description</label>
+                        <textarea id="hero-description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- About Section Editor -->
+            <div id="about-section" class="edit-section">
+                <h2>Edit About Section</h2>
+                <form id="about-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="about-title">Title</label>
+                            <input type="text" id="about-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="about-image">Image URL</label>
+                            <input type="url" id="about-image" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="about-description">Description</label>
+                        <textarea id="about-description" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Skills</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="new-skill" class="form-control" placeholder="Add a new skill">
+                            </div>
+                            <button type="button" id="add-skill" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> Add Skill
+                            </button>
+                        </div>
+                        <div class="skills-container" id="skills-container">
+                            <!-- Skills will be added here -->
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Services Editor -->
+            <div id="services-section" class="edit-section">
+                <h2>Manage Services</h2>
+                <form id="service-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="service-title">Service Title</label>
+                            <input type="text" id="service-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-icon">Icon Class (Font Awesome)</label>
+                            <input type="text" id="service-icon" class="form-control" placeholder="fas fa-code" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-description">Description</label>
+                        <textarea id="service-description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="add-service-btn">
+                            <i class="fas fa-plus"></i> Add Service
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancel-edit" style="display: none;">
+                            Cancel Edit
+                        </button>
+                    </div>
+                </form>
+                <div class="items-list" id="services-list">
+                    <!-- Services will be listed here -->
+                </div>
+            </div>
+
+            <!-- Portfolio Editor -->
+            <div id="portfolio-section" class="edit-section">
+                <h2>Manage Portfolio Projects</h2>
+                <form id="project-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="project-title">Project Title</label>
+                            <input type="text" id="project-title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-image">Image URL</label>
+                            <input type="url" id="project-image" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="project-description">Description</label>
+                            <textarea id="project-description" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="project-link">Project Link (Optional)</label>
+                            <input type="url" id="project-link" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="add-project-btn">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="cancel-project-edit" style="display: none;">
+                            Cancel Edit
+                        </button>
+                    </div>
+                </form>
+                <div class="items-list" id="projects-list">
+                    <!-- Projects will be listed here -->
+                </div>
+            </div>
+
+            <!-- Contact Info Editor -->
+            <div id="contact-section" class="edit-section">
+                <h2>Edit Contact Information</h2>
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-phone">Phone</label>
+                            <input type="tel" id="contact-phone" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-location">Location</label>
+                            <input type="text" id="contact-location" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Social Links</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="social-platform">Platform</label>
+                                <select id="social-platform" class="form-control">
+                                    <option value="github">GitHub</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="twitter">Twitter</option>
+                                    <option value="instagram">Instagram</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="social-url">URL</label>
+                                <input type="url" id="social-url" class="form-control" placeholder="https://">
+                            </div>
+                            <button type="button" id="add-social" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div id="social-links-list">
+                            <!-- Social links will be listed here -->
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Messages Section -->
+            <div id="messages-section" class="edit-section">
+                <h2>Contact Messages</h2>
+                <div class="messages-container" id="messages-container">
+                    <!-- Messages will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="success-message" class="success-message">
+        <i class="fas fa-check-circle"></i> Changes saved successfully!
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Admin JavaScript -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyApkGNHI0SHYq66tO9CrfhxVaAgwNyxpZw",
+            authDomain: "mubarak-hasan-54bfc.firebaseapp.com",
+            databaseURL: "https://mubarak-hasan-54bfc-default-rtdb.firebaseio.com",
+            projectId: "mubarak-hasan-54bfc",
+            storageBucket: "mubarak-hasan-54bfc.appspot.com",
+            messagingSenderId: "1019868829014",
+            appId: "1:1019868829014:web:ceca73ff23ecbd5c58e98e"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // Admin UID
+        const ADMIN_UID = "nyyY63rlyWatQKgIxdneaVpfxsJ3";
+
+        // State variables
+        let currentUser = null;
+        let editingServiceId = null;
+        let editingProjectId = null;
+        let skills = [];
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userEmail = document.getElementById('user-email');
+        const userAvatar = document.getElementById('user-avatar');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const editSections = document.querySelectorAll('.edit-section');
+
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                
+                // Update active state
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Show selected section
+                editSections.forEach(sec => {
+                    sec.classList.remove('active');
+                    if (sec.id === `${section}-section`) {
+                        sec.classList.add('active');
+                    }
+                });
+                
+                // Load data for the section
+                switch(section) {
+                    case 'dashboard':
+                        loadDashboardStats();
+                        break;
+                    case 'messages':
+                        loadMessages();
+                        break;
+                }
+            });
+        });
+
+        // Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Check if user is admin
+                if (user.uid !== ADMIN_UID) {
+                    throw new Error('You do not have admin privileges.');
+                }
+                
+                currentUser = user;
+                showAdminDashboard();
+            } catch (error) {
+                loginError.textContent = error.message;
+                loginError.style.display = 'block';
+                console.error('Login error:', error);
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                currentUser = null;
+                showLoginPage();
+            });
+        });
+
+        // Auth State Observer
+        auth.onAuthStateChanged((user) => {
+            if (user && user.uid === ADMIN_UID) {
+                currentUser = user;
+                showAdminDashboard();
+            } else {
+                showLoginPage();
+            }
+        });
+
+        // Show Admin Dashboard
+        function showAdminDashboard() {
+            loginPage.style.display = 'none';
+            adminDashboard.style.display = 'block';
+            
+            // Update user info
+            userEmail.textContent = currentUser.email;
+            userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+            
+            // Load initial data
+            loadDashboardStats();
+            loadHeroData();
+            loadAboutData();
+            loadServices();
+            loadPortfolio();
+            loadContactData();
+        }
+
+        // Show Login Page
+        function showLoginPage() {
+            loginPage.style.display = 'flex';
+            adminDashboard.style.display = 'none';
+            loginForm.reset();
+            loginError.style.display = 'none';
+        }
+
+        // Show Success Message
+        function showSuccessMessage() {
+            const successMsg = document.getElementById('success-message');
+            successMsg.classList.add('show');
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load Dashboard Statistics
+        function loadDashboardStats() {
+            const portfolioRef = database.ref('portfolio');
+            
+            portfolioRef.once('value').then((snapshot) => {
+                const data = snapshot.val() || {};
+                
+                // Count services
+                const servicesCount = data.services ? Object.keys(data.services).length : 0;
+                document.getElementById('total-services').textContent = servicesCount;
+                
+                // Count projects
+                const projectsCount = data.portfolio ? Object.keys(data.portfolio).length : 0;
+                document.getElementById('total-projects').textContent = projectsCount;
+                
+                // Count messages
+                const messagesRef = database.ref('portfolio/contactSubmissions');
+                messagesRef.once('value').then((messagesSnapshot) => {
+                    const messagesCount = messagesSnapshot.exists() ? Object.keys(messagesSnapshot.val()).length : 0;
+                    document.getElementById('total-messages').textContent = messagesCount;
+                });
+            });
+        }
+
+        // Load Hero Data
+        function loadHeroData() {
+            const heroRef = database.ref('portfolio/hero');
+            
+            heroRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById('hero-title').value = data.title || '';
+                    document.getElementById('hero-tagline').value = data.tagline || '';
+                    document.getElementById('hero-description').value = data.description || '';
+                }
+            });
+            
+            // Save Hero Data
+            document.getElementById('hero-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const heroData = {
+                    title: document.getElementById('hero-title').value,
+                    tagline: document.getElementById('hero-tagline').value,
+                    description: document.getElementById('hero-description').value
+                };
+                
+                heroRef.set(heroData).then(() => {
+                    showSuccessMessage();
+                });
+            });
+        }
+
+        // Load About Data
+        function loadAboutData() {
+            const aboutRef = database.ref('portfolio/about');
+            
+            aboutRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById('about-title').value = data.title || '';
+                    document.getElementById('about-image').value = data.imageUrl || '';
+                    document.getElementById('about-description').value = data.description || '';
+                    
+                    skills = data.skills || [];
+                    updateSkillsDisplay();
+                }
+            });
+            
+            // Add Skill
+            document.getElementById('add-skill').addEventListener('click', () => {
+                const newSkill = document.getElementById('new-skill').value.trim();
+                if (newSkill && !skills.includes(newSkill)) {
+                    skills.push(newSkill);
+                    updateSkillsDisplay();
+                    document.getElementById('new-skill').value = '';
+                }
+            });
+            
+            // Save About Data
+            document.getElementById('about-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const aboutData = {
+                    title: document.getElementById('about-title').value,
+                    imageUrl: document.getElementById('about-image').value || '',
+                    description: document.getElementById('about-description').value,
+                    skills: skills
+                };
+                
+                aboutRef.set(aboutData).then(() => {
+                    showSuccessMessage();
+                });
+            });
+        }
+
+        // Update Skills Display
+        function updateSkillsDisplay() {
+            const container = document.getElementById('skills-container');
+            container.innerHTML = '';
+            
+            skills.forEach((skill, index) => {
+                const skillTag = document.createElement('div');
+                skillTag.className = 'skill-tag';
+                skillTag.innerHTML = `
+                    ${skill}
+                    <button type="button" onclick="removeSkill(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(skillTag);
+            });
+        }
+
+        // Remove Skill (global function for onclick)
+        window.removeSkill = function(index) {
+            skills.splice(index, 1);
+            updateSkillsDisplay();
+        };
+
+        // Load Services
+        function loadServices() {
+            const servicesRef = database.ref('portfolio/services');
+            const servicesList = document.getElementById('services-list');
+            
+            servicesRef.on('value', (snapshot) => {
+                servicesList.innerHTML = '';
+                const services = snapshot.val() || {};
+                
+                Object.entries(services).forEach(([id, service]) => {
+                    const serviceItem = document.createElement('div');
+                    serviceItem.className = 'item-card';
+                    serviceItem.innerHTML = `
+                        <div>
+                            <strong>${service.title}</strong>
+                            <p style="margin: 0.25rem 0 0; color: var(--secondary); font-size: 0.9rem;">
+                                ${service.description.substring(0, 50)}...
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editService('${id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="deleteService('${id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    servicesList.appendChild(serviceItem);
+                });
+            });
+            
+            // Add/Edit Service
+            const serviceForm = document.getElementById('service-form');
+            const addServiceBtn = document.getElementById('add-service-btn');
+            const cancelEditBtn = document.getElementById('cancel-edit');
+            
+            serviceForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const serviceData = {
+                    title: document.getElementById('service-title').value,
+                    icon: document.getElementById('service-icon').value,
+                    description: document.getElementById('service-description').value
+                };
+                
+                if (editingServiceId) {
+                    // Update existing service
+                    servicesRef.child(editingServiceId).update(serviceData).then(() => {
+                        resetServiceForm();
+                        showSuccessMessage();
+                    });
+                } else {
+                    // Add new service
+                    servicesRef.push(serviceData).then(() => {
+                        resetServiceForm();
+                        showSuccessMessage();
+                    });
+                }
+            });
+            
+            cancelEditBtn.addEventListener('click', resetServiceForm);
+        }
+
+        // Edit Service
+        window.editService = function(id) {
+            const servicesRef = database.ref(`portfolio/services/${id}`);
+            servicesRef.once('value').then((snapshot) => {
+                const service = snapshot.val();
+                if (service) {
+                    document.getElementById('service-title').value = service.title;
+                    document.getElementById('service-icon').value = service.icon;
+                    document.getElementById('service-description').value = service.description;
+                    
+                    editingServiceId = id;
+                    document.getElementById('add-service-btn').innerHTML = '<i class="fas fa-save"></i> Update Service';
+                    document.getElementById('cancel-edit').style.display = 'inline-block';
+                }
+            });
+        };
+
+        // Delete Service
+        window.deleteService = function(id) {
+            if (confirm('Are you sure you want to delete this service?')) {
+                database.ref(`portfolio/services/${id}`).remove().then(() => {
+                    showSuccessMessage();
+                });
+            }
+        };
+
+        // Reset Service Form
+        function resetServiceForm() {
+            document.getElementById('service-form').reset();
+            editingServiceId = null;
+            document.getElementById('add-service-btn').innerHTML = '<i class="fas fa-plus"></i> Add Service';
+            document.getElementById('cancel-edit').style.display = 'none';
+        }
+
+        // Load Portfolio
+        function loadPortfolio() {
+            const portfolioRef = database.ref('portfolio/portfolio');
+            const projectsList = document.getElementById('projects-list');
+            
+            portfolioRef.on('value', (snapshot) => {
+                projectsList.innerHTML = '';
+                const projects = snapshot.val() || {};
+                
+                Object.entries(projects).forEach(([id, project]) => {
+                    const projectItem = document.createElement('div');
+                    projectItem.className = 'item-card';
+                    projectItem.innerHTML = `
+                        <div>
+                            <strong>${project.title}</strong>
+                            <p style="margin: 0.25rem 0 0; color: var(--secondary); font-size: 0.9rem;">
+                                ${project.description.substring(0, 50)}...
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editProject('${id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="deleteProject('${id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    projectsList.appendChild(projectItem);
+                });
+            });
+            
+            // Add/Edit Project
+            const projectForm = document.getElementById('project-form');
+            const addProjectBtn = document.getElementById('add-project-btn');
+            const cancelProjectEditBtn = document.getElementById('cancel-project-edit');
+            
+            projectForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const projectData = {
+                    title: document.getElementById('project-title').value,
+                    imageUrl: document.getElementById('project-image').value,
+                    description: document.getElementById('project-description').value,
+                    link: document.getElementById('project-link').value || ''
+                };
+                
+                if (editingProjectId) {
+                    // Update existing project
+                    portfolioRef.child(editingProjectId).update(projectData).then(() => {
+                        resetProjectForm();
+                        showSuccessMessage();
+                    });
+                } else {
+                    // Add new project
+                    portfolioRef.push(projectData).then(() => {
+                        resetProjectForm();
+                        showSuccessMessage();
+                    });
+                }
+            });
+            
+            cancelProjectEditBtn.addEventListener('click', resetProjectForm);
+        }
+
+        // Edit Project
+        window.editProject = function(id) {
+            const portfolioRef = database.ref(`portfolio/portfolio/${id}`);
+            portfolioRef.once('value').then((snapshot) => {
+                const project = snapshot.val();
+                if (project) {
+                    document.getElementById('project-title').value = project.title;
+                    document.getElementById('project-image').value = project.imageUrl;
+                    document.getElementById('project-description').value = project.description;
+                    document.getElementById('project-link').value = project.link || '';
+                    
+                    editingProjectId = id;
+                    document.getElementById('add-project-btn').innerHTML = '<i class="fas fa-save"></i> Update Project';
+                    document.getElementById('cancel-project-edit').style.display = 'inline-block';
+                }
+            });
+        };
+
+        // Delete Project
+        window.deleteProject = function(id) {
+            if (confirm('Are you sure you want to delete this project?')) {
+                database.ref(`portfolio/portfolio/${id}`).remove().then(() => {
+                    showSuccessMessage();
+                });
+            }
+        };
+
+        // Reset Project Form
+        function resetProjectForm() {
+            document.getElementById('project-form').reset();
+            editingProjectId = null;
+            document.getElementById('add-project-btn').innerHTML = '<i class="fas fa-plus"></i> Add Project';
+            document.getElementById('cancel-project-edit').style.display = 'none';
+        }
+
+        // Load Contact Data
+        function loadContactData() {
+            const contactRef = database.ref('portfolio/contact');
+            const socialLinksList = document.getElementById('social-links-list');
+            let socialLinks = {};
+            
+            contactRef.on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                document.getElementById('contact-email').value = data.email || '';
+                document.getElementById('contact-phone').value = data.phone || '';
+                document.getElementById('contact-location').value = data.location || '';
+                
+                socialLinks = data.social || {};
+                updateSocialLinksDisplay();
+            });
+            
+            // Add Social Link
+            document.getElementById('add-social').addEventListener('click', () => {
+                const platform = document.getElementById('social-platform').value;
+                const url = document.getElementById('social-url').value.trim();
+                
+                if (url) {
+                    socialLinks[platform] = url;
+                    updateSocialLinksDisplay();
+                    document.getElementById('social-url').value = '';
+                }
+            });
+            
+            // Update Social Links Display
+            function updateSocialLinksDisplay() {
+                socialLinksList.innerHTML = '';
+                
+                Object.entries(socialLinks).forEach(([platform, url]) => {
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'item-card';
+                    linkItem.style.marginBottom = '0.5rem';
+                    linkItem.innerHTML = `
+                        <div>
+                            <strong style="text-transform: capitalize;">${platform}</strong>
+                            <p style="margin: 0.25rem 0 0; color: var(--secondary); font-size: 0.9rem;">
+                                ${url}
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="removeSocialLink('${platform}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    socialLinksList.appendChild(linkItem);
+                });
+            }
+            
+            // Remove Social Link
+            window.removeSocialLink = function(platform) {
+                delete socialLinks[platform];
+                updateSocialLinksDisplay();
+            };
+            
+            // Save Contact Data
+            document.getElementById('contact-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const contactData = {
+                    email: document.getElementById('contact-email').value,
+                    phone: document.getElementById('contact-phone').value,
+                    location: document.getElementById('contact-location').value,
+                    social: socialLinks
+                };
+                
+                contactRef.set(contactData).then(() => {
+                    showSuccessMessage();
+                });
+            });
+        }
+
+        // Load Messages
+        function loadMessages() {
+            const messagesRef = database.ref('portfolio/contactSubmissions');
+            const messagesContainer = document.getElementById('messages-container');
+            
+            messagesRef.on('value', (snapshot) => {
+                messagesContainer.innerHTML = '';
+                const messages = snapshot.val() || {};
+                
+                Object.entries(messages).forEach(([id, message]) => {
+                    const messageCard = document.createElement('div');
+                    messageCard.className = 'message-card';
+                    messageCard.innerHTML = `
+                        <div class="message-header">
+                            <span class="message-name">${message.name}</span>
+                            <span class="message-email">${message.email}</span>
+                            <span class="message-time">${new Date(message.timestamp).toLocaleString()}</span>
+                        </div>
+                        <p>${message.message}</p>
+                        <button class="btn btn-sm btn-secondary" onclick="deleteMessage('${id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    `;
+                    messagesContainer.appendChild(messageCard);
+                });
+            });
+        }
+
+        // Delete Message
+        window.deleteMessage = function(id) {
+            if (confirm('Are you sure you want to delete this message?')) {
+                database.ref(`portfolio/contactSubmissions/${id}`).remove().then(() => {
+                    showSuccessMessage();
+                });
+            }
+        };
+    </script>
+</body>
+</html>
